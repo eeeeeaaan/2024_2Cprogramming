@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
+#include <synchapi.h>
 
 
 typedef struct {
@@ -9,13 +10,12 @@ typedef struct {
 } words;
 
 void input(int, words *wordList);
+void sortStruct(words *wordList);
+int randomSelect( words *, int *ran);
 
-int randomSelect(FILE *, words *, int *ran);
-
+//2. flash card
+void randomFlash(words *, int *ran, int speed);
 int main() {
-    words word[30];
-    int file = 1;
-    input(file, word);
     //종료 확인하는 변수
     _Bool Finish = 0;
 
@@ -34,7 +34,7 @@ int main() {
         if (num == 1) {
             words words[30];
 
-            int randint = 0;
+
 
 
             int filenumber, outputForm;
@@ -46,43 +46,87 @@ int main() {
 
             // 여기서 word에 n.dic에 해당하는 단어가 담겼음
             input(filenumber, words);
-
             _Bool isFinish = 0;
-            do {
-                char add[] = "2024C_/";
-                char filenum[2];
-                itoa(filenumber, filenum, 10); // filenumber 숫자로 바꾸기
 
-                // 경로 합치기
-                strcat(add, filenum); //ex . 2024C_/1
-                strcat(add, ".dic"); // ex. 2024C_/1.dic
+            if(outputForm ==1){ // 알파벳 정렬
+                sortStruct(words); // 정렬 후 꺼내오기만 하면됨.
+                int index=-1;
+                do{
+                    index++;
 
-                FILE *dict_Ptr = fopen(add, "r");
+                    char *answer = malloc(30 * sizeof(char));
+                    printf("%s",words[index].korean);
 
-
-                char *answer = malloc(30 * sizeof(char));
-                randomSelect(dict_Ptr, words, &randint);
-                // 무작위로 영단어 출력 및 인덱스 반환
-                scanf("%s", answer);
-                if (strcmp(answer, ".quit") == 0) isFinish = 1;
-                else {
-                    //정답확인
-                    if (strcmp(words[randint].english, answer) == 0) {
-                        printf("success\n");
-                        //점수 관련 조치
-                    } else {
-                        printf("fail\n");
+                    scanf("%s", answer);
+                    if (strcmp(answer, ".quit") == 0) isFinish = 1;
+                    else{
+                        if(strcmp(words[index].english, answer)==0){
+                            printf("success\n");
+                        }else{
+                            printf("fail\n");
+                        }
                     }
-                }
+                } while (!isFinish);
+            }else if(outputForm==2){ //무작위 정렬
+                int randint = 0;
+                do {
+                    char *answer = malloc(30 * sizeof(char));
+                    randomSelect(words, &randint);
+                    // 무작위로 영단어 출력 및 인덱스 반환
+                    scanf("%s", answer);
+                    if (strcmp(answer, ".quit") == 0) isFinish = 1;
+                    else {
+                        //정답확인
+                        if (strcmp(words[randint].english, answer) == 0) {
+                            printf("success\n");
+                            //점수 관련 조치
+                        } else {
+                            printf("fail\n");
+                        }
+                    }
 
-                fclose(dict_Ptr);
-            } while (!isFinish);
+
+                } while (!isFinish);
+            }else{
+                printf("유효하지 않은 번호입니다.");
+            }
+
+
 
 
         }
 
             //2. 플래쉬 카드
         else if (num == 2) {
+            words word[30];
+            int speed, filenumber, outputForm, randint=0;
+            printf("속도(초) :");
+            scanf("%d", &speed);
+            printf("파일명(일자) :");
+            scanf("%d", &filenumber);
+
+            printf("출력방식(알파벳 순서대로: 1, 무작위 :2) :");
+            scanf("%d", &outputForm);
+            // 구조체에 담기
+            input(filenumber, word);
+
+            if(outputForm==1){
+                sortStruct(word);
+                for (int i =0 ;i<30; i++){
+                    printf("%s\n", word[i].english);
+                    Sleep(speed*1000);
+                    printf("%s\n", word[i].korean);
+                    Sleep(speed*1000);
+                }
+            }else if (outputForm==2){
+                for (int i =0 ;i<30; i++){
+                    randomFlash(word, &randint, speed );
+                    Sleep(speed*1000);
+                }
+
+            }else{
+                printf("유효하지 않은 출력방식 입니다. ");
+            }
 
         }
 
@@ -108,9 +152,8 @@ int main() {
 
 }
 
-// 랜덤으로 추출하기
-
-int randomSelect(FILE *fp, words *wordList, int *ran) {
+// 랜덤으로 추출하고 한글단어 제시해주기 (1)
+int randomSelect(words *wordList, int *ran) {
     int random = rand() % 30;
     printf("%s  :", wordList[random].korean);
     *ran = random;
@@ -118,8 +161,27 @@ int randomSelect(FILE *fp, words *wordList, int *ran) {
 }
 
 
-// 알파벳 순으로 추출하기
+// 랜덤으로 추출하고 영어, 한글 n초 간격으로 출력하주기
+void randomFlash (words *wordList, int *ran, int speed){
+    int random = rand() %30 ;
+    printf("%s\n", wordList[random].english);
+    Sleep(speed *1000);
+    printf("%s\n", wordList[random].korean);
+}
 
+// 알파벳 순으로 정렬하기
+void sortStruct( words *wordList){
+    words tem;
+    for (int i=0 ; i<30 ;i++){
+        for ( int j=0 ; j<i ;j++){
+            if(strcmp(wordList[i].english, wordList[j].english) ==-1){
+                tem =wordList[i];
+                wordList[i] = wordList[j];
+                wordList[j] = tem;
+            }
+        }
+    }
+}
 
 
 
@@ -142,12 +204,10 @@ void input(int filenumber, words *wordList) {
         fscanf(dic, "%s", whatDictionary);
     }
 
-
-    printf("%s\n", whatDictionary);
     char add[] = "2024C_/";
     // 경로 합치기
     strcat(add, whatDictionary);
-    printf("%s\n", add);
+
     fclose(dic);
 
     // 아까 합쳐놨던 주소의 n.dic로 접근하기
