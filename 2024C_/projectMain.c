@@ -137,7 +137,70 @@ int main() {
 
             // 4. 단어장 관리
         else if (num == 4) {
+            printf("1. 새 파일 추가하기     2. 새 단어 추가하기\n");
+            printf("2. 단어장 보기         4. 단어 파일 목록 보기\n");
+            printf("단어장 관리 종료\n");
+            int num ;
+            printf("번호를 입력하세요 :");
+            scanf("%d", &num);
 
+
+
+
+
+            if(num==1){
+                char n ;
+                int count=0;
+
+                // 현재 dic 수 세기 ( 개행 \n 사용해서 )
+                FILE *fileList = fopen("2024C_/dic.list", "r");
+                while(fscanf(fileList, "%c",&n) != EOF){
+                    if(n == '\n'){
+                        count++;
+                    }
+                }
+                fclose(fileList);
+
+
+                // dic.list에 추가하기
+                FILE *writeList = fopen("2024C_/dic.list", "a");
+
+                fprintf(writeList, "\n%d.dic",count+2);
+                fclose(writeList);
+
+                char *address = malloc(30*sizeof(char));
+                address = "2024C_";
+                char *fileadd= malloc(20*sizeof(char)) ;
+                sprintf(fileadd, "%d.dic", count+2);
+                strcat(address, fileadd);
+                free(fileadd );
+
+                FILE *ndic = fopen(address, "w");
+                _Bool isFinish =0 ;
+                while(!isFinish){
+
+                    if (){
+                        isFinish=1;
+                    }
+                }
+
+                fclose(ndic);
+                free(address);
+
+
+            }
+            else if (num==2){
+
+            }
+            else if(num==3){
+
+            }
+            else if(num==4){
+
+            }
+            else if(num==5){
+
+            }
         }
 
             //5. 프로그램 종료
