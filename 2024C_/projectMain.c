@@ -137,6 +137,11 @@ int main() {
 
             // 4. 단어장 관리
         else if (num == 4) {
+            // 단어장 관리 메뉴로.. 라는게 무슨 소리인가?
+//            _Bool toMainWordList =0;
+//            while(!toMainWordList){
+//                if()
+//            }
             printf("1. 새 파일 추가하기     2. 새 단어 추가하기\n");
             printf("2. 단어장 보기         4. 단어 파일 목록 보기\n");
             printf("단어장 관리 종료\n");
@@ -149,6 +154,7 @@ int main() {
 
 
             if(num==1){
+
                 char n ;
                 int count=0;
 
@@ -168,7 +174,7 @@ int main() {
                 fprintf(writeList, "\n%d.dic",count+2);
                 fclose(writeList);
 
-                char *address = malloc(30*sizeof(char));
+                char *address;
                 address = "2024C_";
                 char *fileadd= malloc(20*sizeof(char)) ;
                 sprintf(fileadd, "%d.dic", count+2);
@@ -177,11 +183,20 @@ int main() {
 
                 FILE *ndic = fopen(address, "w");
                 _Bool isFinish =0 ;
+                int word_count =0 ;
                 while(!isFinish){
+                    char word_mean[50];
 
-                    if (){
+                    //입력받기...
+                    fscanf(stdin, "%[^\n]", word_mean);
+
+                    //파일에 쓰기
+                    fprintf(ndic, "%s", word_mean);
+
+                    if (word_count ==20||strcmp(word_mean, ".add")==0 ){
                         isFinish=1;
                     }
+                    word_count ++;
                 }
 
                 fclose(ndic);
@@ -193,13 +208,20 @@ int main() {
 
             }
             else if(num==3){
-
+                printf("파일명(일자) :");
+                int days;
+                words *WordList ;
+                scanf("%d", &days);
+                input(days, WordList);
+                printf("-----단어장---------\n");
             }
             else if(num==4){
+                printf("-------단어 파일 목록-----------");
+                FILE *fp = fopen("2024C_/dic.list", "r");
 
             }
-            else if(num==5){
-
+            else{
+                printf("잘못된 입력입니다.");
             }
         }
 
@@ -271,25 +293,36 @@ void input(int filenumber, words *wordList) {
     // 경로 합치기
     strcat(add, whatDictionary);
 
+
     fclose(dic);
 
     // 아까 합쳐놨던 주소의 n.dic로 접근하기
     FILE *dd = fopen(add, "r");
 
+    // 현재 단어 수 세기 ( 개행 \n 사용해서 )
+    int count =0 ;
+    char n ;
+    while(fscanf(dd, "%c",&n) != EOF){
+        if(n == '\n'){
+            count++;
+        }
+    }
+    rewind(dd);
 
     char eng[15];
     char kor[50];
 
-    for (int i = 0; i < 30; i++) {
+
+    for (int i = 0; i < 30; i++) { //again
         fscanf(dd, "%[^,], %[^\n]\n", eng, kor);
         strcpy(wordList[i].english, eng);
         strcpy(wordList[i].korean, kor);
     }
 
-    //디버깅: 제대로 출력됨
-//    for (int i = 0; i < 30; i++) {
-//        printf("%s %s\n", wordList[i].english, wordList[i].korean);
-//    }
+
+    for (int i = 0; i <30; i++) {
+        printf("%s %s\n", wordList[i].english, wordList[i].korean);
+    }
     fclose(dd);
 
 }
